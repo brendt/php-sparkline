@@ -26,11 +26,15 @@ $svg = $sparkLine->make();
 
 ![](./.github/img/0.png)
 
+---
+
 ```php
 $sparkLine = SparkLine::new($days)->withColors('#4285F4', '#31ACF2', '#2BC9F4');
 ```
 
 ![](./.github/img/1.png)
+
+---
 
 ```php
 $sparkLine = SparkLine::new($days)
