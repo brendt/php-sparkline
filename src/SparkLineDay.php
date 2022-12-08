@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Brendt\SparkLine;
 
-use DateTimeImmutable;
+use DateTimeInterface;
 
 final class SparkLineDay
 {
     public function __construct(
         public readonly int $count,
-        public readonly DateTimeImmutable $day,
+        public readonly DateTimeInterface $day,
     ) {
     }
 
