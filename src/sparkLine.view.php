@@ -9,7 +9,7 @@
 
                     echo PHP_EOL;
                 }
-            ?>
+?>
         </linearGradient>
         <mask id="sparkline-<?= $id ?>" x="0" y="0" width="<?= $width ?>" height="<?= $height - 2 ?>">
             <polyline

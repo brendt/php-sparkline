@@ -27,8 +27,8 @@ final class SparkLine
     public function __construct(Collection $days)
     {
         $this->days = $days
-            ->sortBy(fn(SparkLineDay $day) => $day->day->getTimestamp())
-            ->mapWithKeys(fn(SparkLineDay $day) => [$day->day->format('Y-m-d') => $day]);
+            ->sortBy(fn (SparkLineDay $day) => $day->day->getTimestamp())
+            ->mapWithKeys(fn (SparkLineDay $day) => [$day->day->format('Y-m-d') => $day]);
 
         $this->maxValue = $this->resolveMaxValueFromDays();
         $this->maxItemAmount = $this->resolveMaxItemAmountFromDays();
@@ -36,7 +36,7 @@ final class SparkLine
 
     public function getTotal(): int
     {
-        return $this->days->sum(fn(SparkLineDay $day) => $day->count) ?? 0;
+        return $this->days->sum(fn (SparkLineDay $day) => $day->count) ?? 0;
     }
 
     public function getPeriod(): Period
@@ -138,7 +138,7 @@ final class SparkLine
         }
 
         return $this->days
-            ->sortByDesc(fn(SparkLineDay $day) => $day->count)
+            ->sortByDesc(fn (SparkLineDay $day) => $day->count)
             ->first()
             ->count;
     }
@@ -153,7 +153,7 @@ final class SparkLine
         $step = floor($this->width / $this->maxItemAmount);
 
         return collect(range(0, $this->maxItemAmount))
-            ->map(fn(int $days) => (new DateTimeImmutable("-{$days} days"))->format('Y-m-d'))
+            ->map(fn (int $days) => (new DateTimeImmutable("-{$days} days"))->format('Y-m-d'))
             ->reverse()
             ->mapWithKeys(function (string $key) {
                 /** @var SparkLineDay|null $day */
@@ -166,7 +166,7 @@ final class SparkLine
                 ];
             })
             ->values()
-            ->map(fn(int $count, int $index) => $index * $step . ',' . $count)
+            ->map(fn (int $count, int $index) => $index * $step . ',' . $count)
             ->implode(' ');
     }
 }
