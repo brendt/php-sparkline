@@ -26,6 +26,36 @@ $svg = $sparkLine->make();
 
 ![](./.github/img/0.png)
 
+To construct a sparkline, you'll have to pass in a collection of `Brendt\SparkLineDay` objects. This object takes two parameters: a `count`, and a `DateTimeInterface`. You could for example convert database entries like so:
+
+```php
+$days = PostVistisPerDay::query()
+    ->orderByDesc('day')
+    ->limit(20)
+    ->get()
+    ->map(fn (object $row) => new SparkLineDay(
+        count: $row->visits,
+        day: Carbon::make($row->published_at_day),
+    ));
+```
+
+In many cases though, you'll want to aggregate data with an SQL query, and convert those aggregations on the fly to `SparkLineDay` objects:
+
+```php
+$days = DB::query()
+    ->from((new Post())->getTable())
+    ->selectRaw('`published_at_day`, COUNT(*) as `visits`')
+    ->groupBy('published_at_day')
+    ->orderByDesc('published_at_day')
+    ->whereNotNull('published_at_day')
+    ->limit(20)
+    ->get()
+    ->map(fn (object $row) => new SparkLineDay(
+        count: $row->visits,
+        day: Carbon::make($row->published_at_day),
+    ));
+```
+
 ### Customization
 
 This package offers some methods to customize the sparkline. First off, you can pick any amount of colors and the sparkline will automatically generate a gradient from them:
