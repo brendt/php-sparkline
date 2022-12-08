@@ -17,7 +17,17 @@ composer require brendt/php-sparkline
 ## Usage
 
 ```php
-$sparkLine = SparkLine::new($days);
+$sparkLine = SparkLine::new(collect([
+    new SparkLineDay(
+        count: 1,
+        day: new DateTimeImmutable('2022-01-01')
+    ),
+    new SparkLineDay(
+        count: 2,
+        day: new DateTimeImmutable('2022-01-02')
+    ),
+    // …
+]));
 
 $total = $sparkLine->getTotal();
 $period = $sparkLine->getPeriod(); // Spatie\Period
