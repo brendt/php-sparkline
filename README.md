@@ -45,7 +45,7 @@ $days = PostVistisPerDay::query()
     ->get()
     ->map(fn (SparkLineDay $row) => new SparkLineDay(
         count: $row->visits,
-        day: Carbon::make($row->published_at_day),
+        day: Carbon::make($row->day),
     ));
 ```
 
