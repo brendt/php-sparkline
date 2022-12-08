@@ -12,11 +12,17 @@ use Spatie\Period\Period;
 final class SparkLine
 {
     private Collection $days;
+
     private int $maxValue;
+
     private int $maxItemAmount;
+
     private int $width = 155;
+
     private int $height = 30;
+
     private int $strokeWidth = 2;
+
     private array $colors = ['#c82161', '#fe2977', '#b848f5', '#b848f5'];
 
     public static function new(Collection $days): self
@@ -39,10 +45,14 @@ final class SparkLine
         return $this->days->sum(fn (SparkLineDay $day) => $day->count) ?? 0;
     }
 
-    public function getPeriod(): Period
+    public function getPeriod(): ?Period
     {
-        $start = $this->days->first()->day;
-        $end = $this->days->last()->day;
+        $start = $this->days->first()?->day;
+        $end = $this->days->last()?->day;
+
+        if (! $start || ! $end) {
+            return null;
+        }
 
         return Period::make(
             $start,

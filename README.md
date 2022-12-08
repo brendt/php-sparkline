@@ -17,7 +17,30 @@ composer require brendt/php-sparkline
 ## Usage
 
 ```php
+$sparkLine = SparkLine::new($days);
+
+$total = $sparkLine->getTotal();
+$period = $sparkLine->getPeriod();
+$svg = $sparkLine->make();
 ```
+
+![](./.github/img/0.png)
+
+```php
+$sparkLine = SparkLine::new($days)->withColors('#4285F4', '#31ACF2', '#2BC9F4');
+```
+
+![](./.github/img/1.png)
+
+```php
+$sparkLine = SparkLine::new($days)
+    ->withStrokeWidth(4)
+    ->withDimensions(500, 100)
+    ->withMaxItemAmount(100)
+    ->withMaxValue(20);
+```
+
+![](./.github/img/2.png)
 
 ## Testing
 
