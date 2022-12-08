@@ -41,9 +41,12 @@ final class SparkLine
 
     public function getPeriod(): Period
     {
+        $start = $this->days->first()->day;
+        $end = $this->days->last()->day;
+
         return Period::make(
-            new DateTimeImmutable("-{$this->maxItemAmount} days"),
-            new DateTimeImmutable('now'),
+            $start,
+            $end,
         );
     }
 
