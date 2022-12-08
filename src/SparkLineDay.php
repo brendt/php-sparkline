@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace App\SparkLine;
+namespace Brendt\SparkLine;
 
-use Carbon\Carbon;
+use DateTimeImmutable;
 
 final class SparkLineDay
 {
     public function __construct(
         public readonly int $count,
-        public readonly Carbon $day,
+        public readonly DateTimeImmutable $day,
     ) {
     }
 
     public function rebase(int $base, int $max): self
     {
         return new self(
-            count: $this->count * ($base / $max),
+            count: (int) floor($this->count * ($base / $max)),
             day: $this->day,
         );
     }

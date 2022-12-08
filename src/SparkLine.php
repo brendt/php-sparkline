@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\SparkLine;
+namespace Brendt\SparkLine;
 
+use DateTimeImmutable;
 use Illuminate\Support\Collection;
 use Ramsey\Uuid\Uuid;
 use Spatie\Period\Period;
@@ -26,8 +27,8 @@ final class SparkLine
     public function __construct(Collection $days)
     {
         $this->days = $days
-            ->sortBy(fn (SparkLineDay $day) => $day->day->timestamp)
-            ->mapWithKeys(fn (SparkLineDay $day) => [$day->day->format('Y-m-d') => $day]);
+            ->sortBy(fn(SparkLineDay $day) => $day->day->getTimestamp())
+            ->mapWithKeys(fn(SparkLineDay $day) => [$day->day->format('Y-m-d') => $day]);
 
         $this->maxValue = $this->resolveMaxValueFromDays();
         $this->maxItemAmount = $this->resolveMaxItemAmountFromDays();
@@ -35,14 +36,14 @@ final class SparkLine
 
     public function getTotal(): int
     {
-        return $this->days->sum(fn (SparkLineDay $day) => $day->count) ?? 0;
+        return $this->days->sum(fn(SparkLineDay $day) => $day->count) ?? 0;
     }
 
     public function getPeriod(): Period
     {
         return Period::make(
-            now()->subDays($this->maxItemAmount),
-            now(),
+            new DateTimeImmutable("-{$this->maxItemAmount} days"),
+            new DateTimeImmutable('now'),
         );
     }
 
@@ -94,14 +95,22 @@ final class SparkLine
 
     public function make(): string
     {
-        return view('sparkLine', [
-            'coordinates' => $this->resolveCoordinates(),
-            'colors' => $this->resolveColors(),
-            'width' => $this->width,
-            'height' => $this->height,
-            'strokeWidth' => $this->strokeWidth,
-            'id' => Uuid::uuid4()->toString(),
-        ])->render();
+        $coordinates = $this->resolveCoordinates();
+        $colors = $this->resolveColors();
+        $width = $this->width;
+        $height = $this->height;
+        $strokeWidth = $this->strokeWidth;
+        $id = Uuid::uuid4()->toString();
+
+        ob_start();
+
+        include __DIR__ . '/sparkLine.view.php';
+
+        $svg = ob_get_contents();
+
+        ob_end_clean();
+
+        return $svg;
     }
 
     public function __toString(): string
@@ -129,7 +138,7 @@ final class SparkLine
         }
 
         return $this->days
-            ->sortByDesc(fn (SparkLineDay $day) => $day->count)
+            ->sortByDesc(fn(SparkLineDay $day) => $day->count)
             ->first()
             ->count;
     }
@@ -144,7 +153,7 @@ final class SparkLine
         $step = floor($this->width / $this->maxItemAmount);
 
         return collect(range(0, $this->maxItemAmount))
-            ->map(fn (int $days) => now()->subDays($days)->format('Y-m-d'))
+            ->map(fn(int $days) => (new DateTimeImmutable("-{$days} days"))->format('Y-m-d'))
             ->reverse()
             ->mapWithKeys(function (string $key) {
                 /** @var SparkLineDay|null $day */
@@ -157,7 +166,7 @@ final class SparkLine
                 ];
             })
             ->values()
-            ->map(fn (int $count, int $index) => $index * $step . ',' . $count)
+            ->map(fn(int $count, int $index) => $index * $step . ',' . $count)
             ->implode(' ');
     }
 }
