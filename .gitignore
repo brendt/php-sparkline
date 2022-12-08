@@ -1,6 +1,5 @@
 .idea
-.php_cs
-.php_cs.cache
+.php-cs-fixer.cache
 .phpunit.result.cache
 build
 composer.lock
@@ -9,4 +8,3 @@ docs
 phpunit.xml
 psalm.xml
 vendor
-.php-cs-fixer.cache
