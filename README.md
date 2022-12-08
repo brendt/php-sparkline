@@ -43,7 +43,7 @@ $days = PostVistisPerDay::query()
     ->orderByDesc('day')
     ->limit(20)
     ->get()
-    ->map(fn (object $row) => new SparkLineDay(
+    ->map(fn (SparkLineDay $row) => new SparkLineDay(
         count: $row->visits,
         day: Carbon::make($row->published_at_day),
     ));
