@@ -51,7 +51,7 @@ $sparkLine = SparkLine::new($days)
 - **`withStrokeWidth`** will determine the stroke's width
 - **`withDimensions`** will determine the width and height of the rendered SVG
 - **`withMaxItemAmount`** will determine how many days will be shown. If you originally passed on more days than this max, then the oldest ones will be omitted. If the max amount is set to a number that's _higher_ than the current amount of days, then the sparkline will contain empty days. By default, the amount of given days will be used. 
-- **`withMaxValue``** will set the maximum value of the sparkline. This is useful if you have multiple sparklines that should all have the same scale. By default, the maximum value is determined based on the given days.
+- **`withMaxValue`** will set the maximum value of the sparkline. This is useful if you have multiple sparklines that should all have the same scale. By default, the maximum value is determined based on the given days.
 
 ## Testing
 
