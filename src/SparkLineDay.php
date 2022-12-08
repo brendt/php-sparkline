@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\SparkLine;
 
 use Carbon\Carbon;
@@ -9,7 +11,8 @@ final class SparkLineDay
     public function __construct(
         public readonly int $count,
         public readonly Carbon $day,
-    ) {}
+    ) {
+    }
 
     public function rebase(int $base, int $max): self
     {
