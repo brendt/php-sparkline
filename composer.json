@@ -1,16 +1,16 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "brendt/php-sparkline",
+    "description": "Generate sparkline SVGs in PHP",
     "keywords": [
-        ":vendor_name",
-        ":package_slug"
+        "brendt",
+        "php-sparkline"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/brendt/php-sparkline",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Brent Roose",
+            "email": "brendt@stitcher.io",
             "role": "Developer"
         }
     ],
@@ -18,30 +18,26 @@
         "php": "^8.1"
     },
     "require-dev": {
-        "laravel/pint": "^1.2",
-        "pestphp/pest": "^1.20",
-        "spatie/ray": "^1.28"
+        "friendsofphp/php-cs-fixer": "^3.13",
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src"
+            "Brendt\\Sparkline\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests"
+            "Brendt\\Sparkline\\Tests\\": "tests"
         }
     },
     "scripts": {
-        "test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest --coverage",
-        "format": "vendor/bin/pint"
+        "test": "vendor/bin/phpunit"
     },
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "phpstan/extension-installer": true,
-            "pestphp/pest-plugin": true
+            "phpstan/extension-installer": true
         }
     },
     "minimum-stability": "dev",
