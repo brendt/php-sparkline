@@ -4,7 +4,7 @@
 [![Tests](https://github.com/brendt/php-sparkline/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/brendt/php-sparkline/actions/workflows/run-tests.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/brendt/php-sparkline.svg?style=flat-square)](https://packagist.org/packages/brendt/php-sparkline)
 
-This is where your description should go. Try and limit it to a paragraph or two. Consider adding a small example.
+PHP-Sparkline generates GitHub style sparkline graphs. Read this guide to know how to use it.
 
 ## Installation
 
