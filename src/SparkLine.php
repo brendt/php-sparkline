@@ -169,8 +169,11 @@ final class SparkLine
             ->map(fn (int $days) => (new DateTimeImmutable("-{$days} days"))->format('Y-m-d'))
             ->reverse()
             ->mapWithKeys(function (string $key) {
+                $interval = (new DateTimeImmutable($key))->diff(new DateTimeImmutable());
+                $index = $interval->days;
+
                 /** @var SparkLineDay|null $day */
-                $day = $this->days[$key] ?? null;
+                $day = $this->days->reverse()->values()[$index] ?? null;
 
                 return [
                     $key => $day
