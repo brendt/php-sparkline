@@ -66,6 +66,23 @@ $days = DB::query()
     ));
 ```
 
+### Precision
+Make precision for 5 minute intervals
+```php
+$sparkLine = SparkLine::new(collect([
+    new SparkLineDay(
+        count: 1,
+        day: new DateTimeImmutable('2022-01-01')
+    ),
+    new SparkLineDay(
+        count: 2,
+        day: new DateTimeImmutable('2022-01-02')
+    ),
+    // …
+]),Period::MINUTE,5);
+$svg = $sparkLine->make();
+```
+
 ### Customization
 
 This package offers some methods to customize the sparkline. First off, you can pick any amount of colors and the sparkline will automatically generate a gradient from them:
