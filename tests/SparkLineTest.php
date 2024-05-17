@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Brendt\SparkLine\Tests;
 
 use Brendt\SparkLine\SparkLine;
-use Brendt\SparkLine\SparkLineDay;
+use Brendt\SparkLine\SparkLineInterval;
 use DateTimeImmutable;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
@@ -16,13 +16,13 @@ final class SparkLineTest extends TestCase
     private function days(): Collection
     {
         return collect([
-            new SparkLineDay(
+            new SparkLineInterval(
                 count: 1,
-                day: new DateTimeImmutable('2022-01-01')
+                dateTime: new DateTimeImmutable('2022-01-01')
             ),
-            new SparkLineDay(
+            new SparkLineInterval(
                 count: 2,
-                day: new DateTimeImmutable('2022-01-02')
+                dateTime: new DateTimeImmutable('2022-01-02')
             ),
         ]);
     }

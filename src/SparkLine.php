@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Brendt\SparkLine;
 
-use DateTimeImmutable;
 use Illuminate\Support\Collection;
 use Ramsey\Uuid\Uuid;
-use Spatie\Period\Period;
 
 final class SparkLine
 {
-    private Collection $days;
+    private Collection $dates;
 
     private int $maxValue;
 
@@ -25,16 +23,16 @@ final class SparkLine
 
     private array $colors = ['#c82161', '#fe2977', '#b848f5', '#b848f5'];
 
-    public static function new(Collection $days): self
+    public static function new(Collection $days, Period $period = Period::DAY, int $precision = 1): self
     {
-        return new self($days);
+        return new self($days, new Precision($period, $precision));
     }
 
-    public function __construct(Collection $days)
+    public function __construct(Collection $days, private readonly Precision $precision)
     {
-        $this->days = $days
-            ->sortBy(fn (SparkLineDay $day) => $day->day->getTimestamp())
-            ->mapWithKeys(fn (SparkLineDay $day) => [$day->day->format('Y-m-d') => $day]);
+        $this->dates = $days
+            ->sortBy(fn (SparkLineInterval $day) => $day->dateTime->getTimestamp())
+            ->mapWithKeys(fn (SparkLineInterval $day) => [$this->precision->getKey($day->dateTime) => $day]);
 
         $this->maxValue = $this->resolveMaxValueFromDays();
         $this->maxItemAmount = $this->resolveMaxItemAmountFromDays();
@@ -42,19 +40,19 @@ final class SparkLine
 
     public function getTotal(): int
     {
-        return $this->days->sum(fn (SparkLineDay $day) => $day->count) ?? 0;
+        return $this->dates->sum(fn (SparkLineInterval $day) => $day->count) ?? 0;
     }
 
-    public function getPeriod(): ?Period
+    public function getPeriod(): ?\Spatie\Period\Period
     {
-        $start = $this->days->first()?->day;
-        $end = $this->days->last()?->day;
+        $start = $this->dates->first()?->dateTime;
+        $end = $this->dates->last()?->dateTime;
 
         if (! $start || ! $end) {
             return null;
         }
 
-        return Period::make(
+        return \Spatie\Period\Period::make(
             $start,
             $end,
         );
@@ -146,19 +144,19 @@ final class SparkLine
 
     private function resolveMaxValueFromDays(): int
     {
-        if ($this->days->isEmpty()) {
+        if ($this->dates->isEmpty()) {
             return 0;
         }
 
-        return $this->days
-            ->sortByDesc(fn (SparkLineDay $day) => $day->count)
+        return $this->dates
+            ->sortByDesc(fn (SparkLineInterval $day) => $day->count)
             ->first()
             ->count;
     }
 
     private function resolveMaxItemAmountFromDays(): int
     {
-        return max($this->days->count(), 1);
+        return max($this->dates->count(), 1);
     }
 
     private function resolveCoordinates(): string
@@ -166,11 +164,11 @@ final class SparkLine
         $step = floor($this->width / $this->maxItemAmount);
 
         return collect(range(0, $this->maxItemAmount))
-            ->map(fn (int $days) => (new DateTimeImmutable("-{$days} days"))->format('Y-m-d'))
+            ->map(fn (int $range) => ($this->precision->getRangeKey($range)))
             ->reverse()
             ->mapWithKeys(function (string $key) {
-                /** @var SparkLineDay|null $day */
-                $day = $this->days[$key] ?? null;
+                /** @var SparkLineInterval|null $day */
+                $day = $this->dates[$key] ?? null;
 
                 return [
                     $key => $day
