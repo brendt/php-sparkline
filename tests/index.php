@@ -11,8 +11,7 @@ $sparkline = (new SparkLine(
     )
 ))
     ->withStrokeWidth(1)
-    ->withDimensions(width: 1000, height: 200)
-;
+    ->withDimensions(width: 1000, height: 200);
 
 ?>
 

@@ -17,79 +17,40 @@ composer require brendt/php-sparkline
 ## Usage
 
 ```php
-$sparkLine = SparkLine::new(
-    new SparkLineDay(
-        count: 1,
-    ),
-    new SparkLineDay(
-        count: 2,
-    ),
-    // …
-));
+$sparkLine = new SparkLine(1, 2, 5, 10, 2));
 
 $total = $sparkLine->getTotal();
-$period = $sparkLine->getPeriod(); // Spatie\Period
+
 $svg = $sparkLine->make();
 ```
 
 ![](./.github/img/0.png)
 
-To construct a sparkline, you'll have to pass in a collection of `Brendt\SparkLineDay` objects. This object takes two parameters: a `count`, and a `DateTimeInterface`. You could for example convert database entries like so:
-
-```php
-$days = PostVistisPerDay::query()
-    ->orderByDesc('day')
-    ->limit(20)
-    ->get()
-    ->map(fn (SparkLineDay $row) => new SparkLineDay(
-        count: $row->visits,
-        day: Carbon::make($row->day),
-    ));
-```
-
-In many cases though, you'll want to aggregate data with an SQL query, and convert those aggregations on the fly to `SparkLineDay` objects:
-
-```php
-$days = DB::query()
-    ->from((new Post())->getTable())
-    ->selectRaw('`published_at_day`, COUNT(*) as `visits`')
-    ->groupBy('published_at_day')
-    ->orderByDesc('published_at_day')
-    ->whereNotNull('published_at_day')
-    ->limit(20)
-    ->get()
-    ->map(fn (object $row) => new SparkLineDay(
-        count: $row->visits,
-        day: Carbon::make($row->published_at_day),
-    ));
-```
+To construct a sparkline, you'll have to pass in an array of values.
 
 ### Customization
 
-This package offers some methods to customize the sparkline. First off, you can pick any amount of colors and the sparkline will automatically generate a gradient from them:
+You can pick any amount of colors and the sparkline will automatically generate a gradient from them:
 
 ```php
-$sparkLine = SparkLine::new($days)->withColors('#4285F4', '#31ACF2', '#2BC9F4');
+$sparkLine = (new SparkLine($days))->withColors('#4285F4', '#31ACF2', '#2BC9F4');
 ```
 
 ![](./.github/img/1.png)
 
-Next, you can configure a bunch of numbers:
+You can configure the stroke width:
 
 ```php
-$sparkLine = SparkLine::new($days)
-    ->withStrokeWidth(4)
-    ->withDimensions(500, 100)
-    ->withMaxItemAmount(100)
-    ->withMaxValue(20);
+$sparkLine = (new SparkLine($days))->withStrokeWidth(4);
+```
+
+As well as the dimensions (in pixels):
+
+```php
+$sparkLine = SparkLine::new($days)->withDimensions(width: 500, height: 100);
 ```
 
 ![](./.github/img/2.png)
-
-- **`withStrokeWidth`** will determine the stroke's width
-- **`withDimensions`** will determine the width and height of the rendered SVG
-- **`withMaxItemAmount`** will determine how many days will be shown. If you originally passed on more days than this max, then the oldest ones will be omitted. If the max amount is set to a number that's _higher_ than the current amount of days, then the sparkline will contain empty days. By default, the amount of given days will be used. 
-- **`withMaxValue`** will set the maximum value of the sparkline. This is useful if you have multiple sparklines that should all have the same scale. By default, the maximum value is determined based on the given days.
 
 ## Testing
 

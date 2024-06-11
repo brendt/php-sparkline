@@ -112,7 +112,7 @@ final class SparkLine
         return $this->make();
     }
 
-    public function getCoordinates(): string
+    private function getCoordinates(): string
     {
         $divider = min($this->width, $this->maxItemAmount);
 
