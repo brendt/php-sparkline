@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Brendt\SparkLine;
 
-
 final class SparkLineEntry
 {
     public function __construct(
