@@ -1,8 +1,12 @@
-<svg width="<?= $width ?>" height="<?= $height ?>">
+<?php
+/** @var \Brendt\SparkLine\SparkLine $this */
+?>
+
+<svg width="<?= $this->width ?>" height="<?= $this->height ?>">
     <defs>
-        <linearGradient id="gradient-<?= $id ?>" x1="0" x2="0" y1="1" y2="0">
+        <linearGradient id="gradient-<?= $this->id ?>" x1="0" x2="0" y1="1" y2="0">
             <?php
-                foreach ($colors as $percentage => $color) {
+                foreach ($this->colors as $percentage => $color) {
                     echo <<<HTML
                     <stop offset="{$percentage}%" stop-color="{$color}"></stop>
                     HTML;
@@ -11,19 +15,19 @@
                 }
 ?>
         </linearGradient>
-        <mask id="sparkline-<?= $id ?>" x="0" y="0" width="<?= $width ?>" height="<?= $height - 2 ?>">
+        <mask id="sparkline-<?= $this->id ?>" x="0" y="0" width="<?= $this->width ?>" height="<?= $this->height - 2 ?>">
             <polyline
-                transform="translate(0, <?= $height - 2 ?>) scale(1,-1)"
-                points="<?= $coordinates ?>"
+                transform="translate(0, <?= $this->height - 2 ?>) scale(1,-1)"
+                points="<?= $this->getCoordinates() ?>"
                 fill="transparent"
-                stroke="<?= $colors[0] ?>"
-                stroke-width="<?= $strokeWidth ?>"
+                stroke="<?= $this->colors[0] ?>"
+                stroke-width="<?= $this->strokeWidth ?>"
             >
             </polyline>
         </mask>
     </defs>
 
     <g transform="translate(0, 0)">
-        <rect x="0" y="0" width="<?= $width ?>" height="<?= $height ?>" style="stroke: none; fill: url(#gradient-<?= $id ?>); mask: url(#sparkline-<?= $id ?>)"></rect>
+        <rect x="0" y="0" width="<?= $this->width ?>" height="<?= $this->height ?>" style="stroke: none; fill: url(#gradient-<?= $this->id ?>); mask: url(#sparkline-<?= $this->id ?>)"></rect>
     </g>
 </svg>

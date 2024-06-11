@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Brendt\SparkLine;
 
-use DateTimeImmutable;
-use Illuminate\Support\Collection;
 use Ramsey\Uuid\Uuid;
-use Spatie\Period\Period;
 
 final class SparkLine
 {
-    private Collection $days;
+    /** @var \Brendt\SparkLine\SparkLineEntry[] */
+    private array $entries;
 
     private int $maxValue;
 
@@ -23,40 +21,30 @@ final class SparkLine
 
     private int $strokeWidth = 2;
 
-    private array $colors = ['#c82161', '#fe2977', '#b848f5', '#b848f5'];
+    private array $colors;
 
-    public static function new(Collection $days): self
+    private string $id;
+
+    public function __construct(SparkLineEntry|int ...$entries)
     {
-        return new self($days);
-    }
+        $this->id = Uuid::uuid4()->toString();
 
-    public function __construct(Collection $days)
-    {
-        $this->days = $days
-            ->sortBy(fn (SparkLineDay $day) => $day->day->getTimestamp())
-            ->mapWithKeys(fn (SparkLineDay $day) => [$day->day->format('Y-m-d') => $day]);
+        $this->entries = array_map(
+            fn (SparkLineEntry|int $entry) => is_int($entry) ? new SparkLineEntry($entry) : $entry,
+            $entries
+        );
 
-        $this->maxValue = $this->resolveMaxValueFromDays();
-        $this->maxItemAmount = $this->resolveMaxItemAmountFromDays();
+        $this->maxValue = $this->resolveMaxValue($this->entries);
+        $this->maxItemAmount = $this->resolveMaxItemAmount($this->entries);
+        $this->colors = $this->resolveColors(['#c82161', '#fe2977', '#b848f5', '#b848f5']);
     }
 
     public function getTotal(): int
     {
-        return $this->days->sum(fn (SparkLineDay $day) => $day->count) ?? 0;
-    }
-
-    public function getPeriod(): ?Period
-    {
-        $start = $this->days->first()?->day;
-        $end = $this->days->last()?->day;
-
-        if (! $start || ! $end) {
-            return null;
-        }
-
-        return Period::make(
-            $start,
-            $end,
+        return array_reduce(
+            $this->entries,
+            fn (int $carry, SparkLineEntry $entry) => $carry + $entry->count,
+            0
         );
     }
 
@@ -83,7 +71,7 @@ final class SparkLine
     {
         $clone = clone $this;
 
-        $clone->maxValue = $maxValue ?? $clone->resolveMaxValueFromDays();
+        $clone->maxValue = $maxValue ?? $clone->resolveMaxValue($this->entries);
 
         return $clone;
     }
@@ -92,7 +80,7 @@ final class SparkLine
     {
         $clone = clone $this;
 
-        $clone->maxItemAmount = $maxItemAmount ?? $clone->resolveMaxItemAmountFromDays();
+        $clone->maxItemAmount = $maxItemAmount ?? $clone->resolveMaxItemAmount($this->entries);
 
         return $clone;
     }
@@ -101,20 +89,13 @@ final class SparkLine
     {
         $clone = clone $this;
 
-        $clone->colors = $colors;
+        $clone->colors = $this->resolveColors($colors);
 
         return $clone;
     }
 
     public function make(): string
     {
-        $coordinates = $this->resolveCoordinates();
-        $colors = $this->resolveColors();
-        $width = $this->width;
-        $height = $this->height;
-        $strokeWidth = $this->strokeWidth;
-        $id = Uuid::uuid4()->toString();
-
         ob_start();
 
         include __DIR__ . '/sparkLine.view.php';
@@ -131,55 +112,47 @@ final class SparkLine
         return $this->make();
     }
 
-    private function resolveColors(): array
+    public function getCoordinates(): string
     {
-        $percentageStep = floor(100 / count($this->colors));
+        $divider = min($this->width, $this->maxItemAmount);
+
+        $step = floor($this->width / $divider);
+
+        $coordinates = [];
+
+        foreach ($this->entries as $index => $entry) {
+            $coordinates[] = $index * $step . ',' . $entry->rebase($this->height - 5, $this->maxValue)->count;
+        }
+
+        return implode(' ', $coordinates);
+    }
+
+    private function resolveColors(array $colors): array
+    {
+        $percentageStep = floor(100 / count($colors));
 
         $colorsWithPercentage = [];
 
-        foreach ($this->colors as $i => $color) {
+        foreach ($colors as $i => $color) {
             $colorsWithPercentage[$i * $percentageStep] = $color;
         }
 
         return $colorsWithPercentage;
     }
 
-    private function resolveMaxValueFromDays(): int
+    private function resolveMaxValue(array $entries): int
     {
-        if ($this->days->isEmpty()) {
+        if ($entries === []) {
             return 0;
         }
 
-        return $this->days
-            ->sortByDesc(fn (SparkLineDay $day) => $day->count)
-            ->first()
-            ->count;
+        usort($entries, fn (SparkLineEntry $a, SparkLineEntry $b) => $a->count <=> $b->count);
+
+        return $entries[array_key_last($entries)]->count;
     }
 
-    private function resolveMaxItemAmountFromDays(): int
+    private function resolveMaxItemAmount(array $entries): int
     {
-        return max($this->days->count(), 1);
-    }
-
-    private function resolveCoordinates(): string
-    {
-        $step = floor($this->width / $this->maxItemAmount);
-
-        return collect(range(0, $this->maxItemAmount))
-            ->map(fn (int $days) => (new DateTimeImmutable("-{$days} days"))->format('Y-m-d'))
-            ->reverse()
-            ->mapWithKeys(function (string $key) {
-                /** @var SparkLineDay|null $day */
-                $day = $this->days[$key] ?? null;
-
-                return [
-                    $key => $day
-                        ? $day->rebase($this->height - 5, $this->maxValue)->count
-                        : 1, // Default value is 1 because 0 renders too small a line
-                ];
-            })
-            ->values()
-            ->map(fn (int $count, int $index) => $index * $step . ',' . $count)
-            ->implode(' ');
+        return max(count($entries), 1);
     }
 }

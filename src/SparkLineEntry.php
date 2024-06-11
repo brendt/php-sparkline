@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Brendt\SparkLine;
 
-use DateTimeInterface;
 
-final class SparkLineDay
+final class SparkLineEntry
 {
     public function __construct(
         public readonly int $count,
-        public readonly DateTimeInterface $day,
     ) {
     }
 
@@ -18,7 +16,6 @@ final class SparkLineDay
     {
         return new self(
             count: (int) floor($this->count * ($base / $max)),
-            day: $this->day,
         );
     }
 }
