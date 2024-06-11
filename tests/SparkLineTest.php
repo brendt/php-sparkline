@@ -5,32 +5,27 @@ declare(strict_types=1);
 namespace Brendt\SparkLine\Tests;
 
 use Brendt\SparkLine\SparkLine;
-use Brendt\SparkLine\SparkLineDay;
-use DateTimeImmutable;
-use Illuminate\Support\Collection;
+use Brendt\SparkLine\SparkLineEntry;
 use PHPUnit\Framework\TestCase;
-use Spatie\Period\Period;
 
 final class SparkLineTest extends TestCase
 {
-    private function days(): Collection
+    private function entries(): array
     {
-        return collect([
-            new SparkLineDay(
+        return [
+            new SparkLineEntry(
                 count: 1,
-                day: new DateTimeImmutable('2022-01-01')
             ),
-            new SparkLineDay(
+            new SparkLineEntry(
                 count: 2,
-                day: new DateTimeImmutable('2022-01-02')
             ),
-        ]);
+        ];
     }
 
     /** @test */
     public function test_create_sparkline(): void
     {
-        $sparkLine = SparkLine::new($this->days())->make();
+        $sparkLine = (new SparkLine(...$this->entries()))->make();
 
         $this->assertStringContainsString('<svg', $sparkLine);
     }
@@ -38,7 +33,7 @@ final class SparkLineTest extends TestCase
     /** @test */
     public function test_colors(): void
     {
-        $sparkLine = SparkLine::new($this->days())
+        $sparkLine = (new SparkLine(...$this->entries()))
             ->withColors('red', 'green', 'blue')
             ->make();
 
@@ -50,7 +45,7 @@ final class SparkLineTest extends TestCase
     /** @test */
     public function test_stroke_width(): void
     {
-        $sparkLine = SparkLine::new($this->days())
+        $sparkLine = (new SparkLine(...$this->entries()))
             ->withStrokeWidth(50)
             ->make();
 
@@ -60,7 +55,7 @@ final class SparkLineTest extends TestCase
     /** @test */
     public function test_dimensions(): void
     {
-        $sparkLine = SparkLine::new($this->days())
+        $sparkLine = (new SparkLine(...$this->entries()))
             ->withDimensions(500, 501)
             ->make();
 
@@ -69,20 +64,9 @@ final class SparkLineTest extends TestCase
     }
 
     /** @test */
-    public function test_get_period(): void
-    {
-        $sparkLine = SparkLine::new($this->days());
-
-        $this->assertTrue(
-            Period::fromString('[2022-01-01, 2022-01-02]')
-                ->equals($sparkLine->getPeriod()),
-        );
-    }
-
-    /** @test */
     public function test_get_total(): void
     {
-        $sparkLine = SparkLine::new($this->days());
+        $sparkLine = (new SparkLine(...$this->entries()));
 
         $this->assertEquals(3, $sparkLine->getTotal());
     }
