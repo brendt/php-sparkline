@@ -17,7 +17,7 @@ composer require brendt/php-sparkline
 ## Usage
 
 ```php
-$sparkLine = new SparkLine(1, 2, 5, 10, 2));
+$sparkLine = new SparkLine(1, 2, 5, 10, 2);
 
 $total = $sparkLine->getTotal();
 
