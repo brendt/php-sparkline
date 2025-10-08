@@ -13,6 +13,10 @@ final class SparkLineEntry
 
     public function rebase(int $base, int $max): self
     {
+        if($max === 0) {
+            return $this;
+        }
+
         return new self(
             count: (int) floor($this->count * ($base / $max)),
         );
