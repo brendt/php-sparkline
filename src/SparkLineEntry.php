@@ -13,7 +13,7 @@ final class SparkLineEntry
 
     public function rebase(int $base, int $max): self
     {
-        if($max === 0) {
+        if ($max === 0) {
             return $this;
         }
 

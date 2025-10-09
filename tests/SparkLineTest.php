@@ -6,7 +6,6 @@ namespace Brendt\SparkLine\Tests;
 
 use Brendt\SparkLine\SparkLine;
 use Brendt\SparkLine\SparkLineEntry;
-use DivisionByZeroError;
 use PHPUnit\Framework\TestCase;
 
 final class SparkLineTest extends TestCase
