@@ -6,6 +6,7 @@ namespace Brendt\SparkLine\Tests;
 
 use Brendt\SparkLine\SparkLine;
 use Brendt\SparkLine\SparkLineEntry;
+use DivisionByZeroError;
 use PHPUnit\Framework\TestCase;
 
 final class SparkLineTest extends TestCase
@@ -69,5 +70,13 @@ final class SparkLineTest extends TestCase
         $sparkLine = (new SparkLine(...$this->entries()));
 
         $this->assertEquals(3, $sparkLine->getTotal());
+    }
+
+    /** @test */
+    public function test_entries_all_with_zero_values_doesnt_cause_error(): void
+    {
+        $sparkLine = (new SparkLine(0, 0, 0, 0))->make();
+
+        $this->assertStringContainsString('<svg', $sparkLine);
     }
 }
